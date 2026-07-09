@@ -1,0 +1,65 @@
+table: mortgage_account
+dataset: core
+project: your_gcp_project
+description: "One row per mortgage loan account held by a customer"
+partition_by:
+  field: origination_date
+  type: DATE
+cluster_by: [customer_id, status]
+columns:
+  - name: mortgage_account_id
+    type: STRING
+    mode: REQUIRED
+    description: "Primary key"
+  - name: customer_id
+    type: STRING
+    mode: REQUIRED
+    description: "Foreign key to customer.customer_id"
+  - name: property_address
+    type: STRING
+    mode: REQUIRED
+    description: "Physical address of the mortgaged property"
+  - name: property_value
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Appraised value of the property at origination"
+  - name: loan_amount
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Original principal loan amount"
+  - name: outstanding_balance
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Remaining principal balance"
+  - name: currency
+    type: STRING
+    mode: REQUIRED
+    description: "ISO 4217 currency code, e.g. USD"
+  - name: interest_rate
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Annual interest rate as decimal, e.g. 0.065 for 6.5%"
+  - name: interest_rate_type
+    type: STRING
+    mode: REQUIRED
+    description: "e.g. fixed, variable"
+  - name: loan_term_months
+    type: INT64
+    mode: REQUIRED
+    description: "Loan term in months, e.g. 360 for 30-year"
+  - name: monthly_payment
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Scheduled monthly payment amount"
+  - name: origination_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the mortgage was originated"
+  - name: maturity_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the loan is scheduled to be fully paid"
+  - name: status
+    type: STRING
+    mode: REQUIRED
+    description: "e.g. active, paid_off, defaulted, foreclosed"

@@ -1,0 +1,69 @@
+semantic_models:
+  - name: mortgage_account
+    description: "Semantic layer over the core.mortgage_account table"
+    model: ref('mortgage_account')
+    defaults:
+      agg_time_dimension: origination_date
+    entities:
+      - name: mortgage_account
+        type: primary
+        expr: mortgage_account_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+    dimensions:
+      - name: interest_rate_type
+        type: categorical
+        expr: interest_rate_type
+      - name: status
+        type: categorical
+        expr: status
+      - name: origination_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: maturity_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: currency
+        type: categorical
+        expr: currency
+    measures:
+      - name: outstanding_balance
+        agg: sum
+        expr: outstanding_balance
+      - name: mortgage_count
+        agg: count_distinct
+        expr: mortgage_account_id
+      - name: total_loan_amount
+        agg: sum
+        expr: loan_amount
+      - name: avg_interest_rate
+        agg: average
+        expr: interest_rate
+
+metrics:
+  - name: total_mortgage_balance
+    description: "Total outstanding balance across all mortgages"
+    type: simple
+    type_params:
+      measure: outstanding_balance
+
+  - name: total_mortgages
+    description: "Total number of mortgage accounts"
+    type: simple
+    type_params:
+      measure: mortgage_count
+
+  - name: total_originated_volume
+    description: "Total original loan amount across all mortgages"
+    type: simple
+    type_params:
+      measure: total_loan_amount
+
+  - name: avg_mortgage_rate
+    description: "Average interest rate across all mortgages"
+    type: simple
+    type_params:
+      measure: avg_interest_rate

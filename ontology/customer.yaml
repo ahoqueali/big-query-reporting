@@ -1,0 +1,26 @@
+entity: Customer
+description: "A party who has signed up and may hold Accounts and Mortgages"
+properties:
+  - name: hasRegion
+    range: Region
+    description: "The sales region the customer belongs to"
+  - name: hasLifetimeValue
+    range: Money
+    description: "Cumulative revenue attributed to this customer"
+  - name: hasStatus
+    range: ActiveStatus
+    description: "Whether the customer is currently active"
+rules:
+  - name: hasAtLeastOneAccount
+    description: "A Customer must hold at least one SavingAccount, CurrentAccount, or MortgageAccount"
+    type: integrity
+    expression: "Customer[customer_id] implies exists SavingAccount[customer_id] or exists CurrentAccount[customer_id] or exists MortgageAccount[customer_id]"
+  - name: requiresActiveStatusForPositiveLtv
+    description: "A Customer with a positive lifetime value must be active"
+    type: constraint
+    expression: "lifetime_value > 0 implies is_active = true"
+maps_to:
+  semantic_model: customer
+  entity: customer
+  dimensions: [region, is_active]
+  measures: [lifetime_value, customer_count]

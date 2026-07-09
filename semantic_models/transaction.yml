@@ -1,0 +1,64 @@
+semantic_models:
+  - name: transaction
+    description: "Semantic layer over the core.transaction table"
+    model: ref('transaction')
+    defaults:
+      agg_time_dimension: transaction_date
+    entities:
+      - name: transaction
+        type: primary
+        expr: transaction_id
+      - name: account
+        type: foreign
+        expr: account_id
+    dimensions:
+      - name: transaction_type
+        type: categorical
+        expr: transaction_type
+      - name: status
+        type: categorical
+        expr: status
+      - name: transaction_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: currency
+        type: categorical
+        expr: currency
+    measures:
+      - name: amount
+        agg: sum
+        expr: amount
+      - name: transaction_count
+        agg: count
+        expr: transaction_id
+      - name: net_flow
+        agg: sum
+        expr: amount
+
+metrics:
+  - name: total_volume
+    description: "Total transaction volume across all accounts"
+    type: simple
+    type_params:
+      measure: amount
+
+  - name: total_transactions
+    description: "Total number of transactions"
+    type: simple
+    type_params:
+      measure: transaction_count
+
+  - name: net_cash_flow
+    description: "Net cash flow (credits minus debits)"
+    type: simple
+    type_params:
+      measure: net_flow
+
+  - name: withdrawal_volume
+    description: "Total amount withdrawn"
+    type: simple
+    type_params:
+      measure: amount
+    filter: |
+      {{ Dimension('transaction__transaction_type') }} = 'withdrawal'

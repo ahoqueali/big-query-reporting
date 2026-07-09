@@ -1,0 +1,45 @@
+entity: SavingAccount
+description: "A deposit account held at the institution that earns interest"
+properties:
+  - name: hasBalance
+    range: Money
+    description: "Current monetary balance of the savings account"
+  - name: hasCurrency
+    range: Currency
+    description: "ISO 4217 currency the account is denominated in"
+  - name: hasInterestRate
+    range: Rate
+    description: "Annual interest rate applied to the balance"
+  - name: hasMinimumBalance
+    range: Money
+    description: "Minimum balance required to avoid service fees"
+  - name: hasStatus
+    range: AccountStatus
+    description: "Lifecycle state, e.g. active, closed, frozen"
+relationships:
+  - name: heldBy
+    target: Customer
+    cardinality: many-to-one
+    description: "A SavingAccount is held by exactly one Customer"
+rules:
+  - name: nonNegativeBalance
+    description: "A SavingAccount balance must never be negative"
+    type: constraint
+    expression: "balance >= 0"
+  - name: validInterestRate
+    description: "Interest rate must be between 0 and 1 (0% to 100%)"
+    type: constraint
+    expression: "0.0 <= interest_rate <= 1.0"
+  - name: minimumBalanceFloor
+    description: "Minimum balance must be zero or greater if specified"
+    type: constraint
+    expression: "minimum_balance >= 0"
+  - name: interestAccrual
+    description: "Interest is calculated as balance * interest_rate / 365 per day"
+    type: derivation
+    expression: "daily_interest = balance * interest_rate / 365"
+maps_to:
+  semantic_model: saving_account
+  entity: saving_account
+  dimensions: [interest_rate, status, currency, opened_date]
+  measures: [balance, saving_account_count, avg_saving_balance]

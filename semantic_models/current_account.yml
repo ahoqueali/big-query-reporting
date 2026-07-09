@@ -1,0 +1,56 @@
+semantic_models:
+  - name: current_account
+    description: "Semantic layer over the core.current_account table"
+    model: ref('current_account')
+    defaults:
+      agg_time_dimension: opened_date
+    entities:
+      - name: current_account
+        type: primary
+        expr: current_account_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+    dimensions:
+      - name: has_debit_card
+        type: categorical
+        expr: has_debit_card
+      - name: opened_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: status
+        type: categorical
+        expr: status
+      - name: currency
+        type: categorical
+        expr: currency
+    measures:
+      - name: balance
+        agg: sum
+        expr: balance
+      - name: current_account_count
+        agg: count_distinct
+        expr: current_account_id
+      - name: avg_current_balance
+        agg: average
+        expr: balance
+
+metrics:
+  - name: total_current_balance
+    description: "Total balance across all current accounts"
+    type: simple
+    type_params:
+      measure: balance
+
+  - name: total_current_accounts
+    description: "Total number of current accounts"
+    type: simple
+    type_params:
+      measure: current_account_count
+
+  - name: avg_current_account_balance
+    description: "Average balance per current account"
+    type: simple
+    type_params:
+      measure: avg_current_balance

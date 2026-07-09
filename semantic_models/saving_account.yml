@@ -1,0 +1,56 @@
+semantic_models:
+  - name: saving_account
+    description: "Semantic layer over the core.saving_account table"
+    model: ref('saving_account')
+    defaults:
+      agg_time_dimension: opened_date
+    entities:
+      - name: saving_account
+        type: primary
+        expr: saving_account_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+    dimensions:
+      - name: interest_rate
+        type: categorical
+        expr: interest_rate
+      - name: opened_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: status
+        type: categorical
+        expr: status
+      - name: currency
+        type: categorical
+        expr: currency
+    measures:
+      - name: balance
+        agg: sum
+        expr: balance
+      - name: saving_account_count
+        agg: count_distinct
+        expr: saving_account_id
+      - name: avg_saving_balance
+        agg: average
+        expr: balance
+
+metrics:
+  - name: total_saving_balance
+    description: "Total balance across all savings accounts"
+    type: simple
+    type_params:
+      measure: balance
+
+  - name: total_saving_accounts
+    description: "Total number of savings accounts"
+    type: simple
+    type_params:
+      measure: saving_account_count
+
+  - name: avg_saving_account_balance
+    description: "Average balance per savings account"
+    type: simple
+    type_params:
+      measure: avg_saving_balance

@@ -1,0 +1,49 @@
+table: transaction
+dataset: core
+project: your_gcp_project
+description: "One row per financial transaction against an account"
+partition_by:
+  field: transaction_date
+  type: DATE
+cluster_by: [account_id, transaction_type]
+columns:
+  - name: transaction_id
+    type: STRING
+    mode: REQUIRED
+    description: "Primary key"
+  - name: account_id
+    type: STRING
+    mode: REQUIRED
+    description: "Foreign key to saving_account.saving_account_id or current_account.current_account_id"
+  - name: transaction_type
+    type: STRING
+    mode: REQUIRED
+    description: "e.g. deposit, withdrawal, transfer, fee, interest"
+  - name: amount
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Transaction amount (positive for credit, negative for debit)"
+  - name: currency
+    type: STRING
+    mode: REQUIRED
+    description: "ISO 4217 currency code, e.g. USD"
+  - name: balance_before
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Account balance immediately before this transaction"
+  - name: balance_after
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Account balance immediately after this transaction"
+  - name: description
+    type: STRING
+    mode: NULLABLE
+    description: "Human-readable transaction description"
+  - name: transaction_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the transaction posted"
+  - name: status
+    type: STRING
+    mode: REQUIRED
+    description: "e.g. posted, pending, cancelled"

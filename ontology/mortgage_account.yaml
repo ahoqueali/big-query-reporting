@@ -1,0 +1,60 @@
+entity: MortgageAccount
+description: "A secured loan account used to finance a real estate purchase"
+properties:
+  - name: hasPropertyAddress
+    range: String
+    description: "Physical address of the mortgaged property"
+  - name: hasPropertyValue
+    range: Money
+    description: "Appraised value of the property at origination"
+  - name: hasLoanAmount
+    range: Money
+    description: "Original principal amount borrowed"
+  - name: hasOutstandingBalance
+    range: Money
+    description: "Remaining principal balance yet to be repaid"
+  - name: hasCurrency
+    range: Currency
+    description: "ISO 4217 currency the mortgage is denominated in"
+  - name: hasInterestRate
+    range: Rate
+    description: "Annual interest rate applied to the outstanding balance"
+  - name: hasInterestRateType
+    range: RateType
+    description: "Whether the rate is fixed or variable"
+  - name: hasLoanTerm
+    range: Duration
+    description: "Loan term in months"
+  - name: hasMonthlyPayment
+    range: Money
+    description: "Scheduled monthly payment amount"
+  - name: hasStatus
+    range: LoanStatus
+    description: "Lifecycle state, e.g. active, paid_off, defaulted, foreclosed"
+relationships:
+  - name: heldBy
+    target: Customer
+    cardinality: many-to-one
+    description: "A MortgageAccount is held by exactly one Customer"
+rules:
+  - name: outstandingWithinLoan
+    description: "Outstanding balance must not exceed the original loan amount"
+    type: constraint
+    expression: "outstanding_balance <= loan_amount"
+  - name: positiveInterestRate
+    description: "Interest rate must be greater than zero"
+    type: constraint
+    expression: "interest_rate > 0"
+  - name: maturityAfterOrigination
+    description: "Maturity date must be after the origination date"
+    type: constraint
+    expression: "maturity_date > origination_date"
+  - name: amortizationSchedule
+    description: "Monthly payment is derived from loan amount, interest rate, and term"
+    type: derivation
+    expression: "monthly_payment = loan_amount * (interest_rate/12 * (1+interest_rate/12)^loan_term_months) / ((1+interest_rate/12)^loan_term_months - 1)"
+maps_to:
+  semantic_model: mortgage_account
+  entity: mortgage_account
+  dimensions: [interest_rate_type, status, origination_date, maturity_date, currency]
+  measures: [outstanding_balance, mortgage_count, total_loan_amount, avg_interest_rate]

@@ -1,0 +1,29 @@
+table: customer
+dataset: core
+project: your_gcp_project
+description: "One row per customer"
+partition_by:
+  field: signup_date
+  type: DATE
+cluster_by: [region, customer_id]
+columns:
+  - name: customer_id
+    type: STRING
+    mode: REQUIRED
+    description: "Primary key"
+  - name: signup_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the customer signed up"
+  - name: region
+    type: STRING
+    mode: NULLABLE
+    description: "Sales region code"
+  - name: lifetime_value
+    type: NUMERIC
+    mode: NULLABLE
+    description: "Cumulative revenue from this customer"
+  - name: is_active
+    type: BOOL
+    mode: NULLABLE
+    description: "Whether the customer has an active subscription"

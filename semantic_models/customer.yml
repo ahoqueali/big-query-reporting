@@ -1,0 +1,43 @@
+semantic_models:
+  - name: customer
+    description: "Semantic layer over the core.customer table"
+    model: ref('customer')
+    defaults:
+      agg_time_dimension: signup_date
+    entities:
+      - name: customer
+        type: primary
+        expr: customer_id
+    dimensions:
+      - name: region
+        type: categorical
+        expr: region
+      - name: signup_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: is_active
+        type: categorical
+        expr: is_active
+    measures:
+      - name: lifetime_value
+        agg: sum
+        expr: lifetime_value
+      - name: customer_count
+        agg: count_distinct
+        expr: customer_id
+
+metrics:
+  - name: total_ltv
+    description: "Total lifetime value across all customers"
+    type: simple
+    type_params:
+      measure: lifetime_value
+
+  - name: active_customers
+    description: "Count of customers currently active"
+    type: simple
+    type_params:
+      measure: customer_count
+    filter: |
+      {{ Dimension('customer__is_active') }} = true

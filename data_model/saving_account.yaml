@@ -1,0 +1,41 @@
+table: saving_account
+dataset: core
+project: your_gcp_project
+description: "One row per savings account held by a customer"
+partition_by:
+  field: opened_date
+  type: DATE
+cluster_by: [customer_id, interest_rate]
+columns:
+  - name: saving_account_id
+    type: STRING
+    mode: REQUIRED
+    description: "Primary key"
+  - name: customer_id
+    type: STRING
+    mode: REQUIRED
+    description: "Foreign key to customer.customer_id"
+  - name: balance
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Current account balance"
+  - name: currency
+    type: STRING
+    mode: REQUIRED
+    description: "ISO 4217 currency code, e.g. USD"
+  - name: interest_rate
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Annual interest rate as decimal, e.g. 0.035 for 3.5%"
+  - name: minimum_balance
+    type: NUMERIC
+    mode: NULLABLE
+    description: "Minimum balance required to avoid fees"
+  - name: opened_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the account was opened"
+  - name: status
+    type: STRING
+    mode: NULLABLE
+    description: "e.g. active, closed, frozen"

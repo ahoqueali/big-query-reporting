@@ -1,0 +1,56 @@
+entity: Transaction
+description: "A financial event that debits or credits an Account balance"
+properties:
+  - name: hasAmount
+    range: Money
+    description: "Transaction amount; positive for credit, negative for debit"
+  - name: hasCurrency
+    range: Currency
+    description: "ISO 4217 currency the transaction is denominated in"
+  - name: hasTransactionType
+    range: TransactionType
+    description: "Category of transaction, e.g. deposit, withdrawal, fee"
+  - name: hasStatus
+    range: TransactionStatus
+    description: "Lifecycle state, e.g. posted, pending, cancelled"
+  - name: hasDescription
+    range: String
+    description: "Human-readable memo or description"
+  - name: hasBalanceBefore
+    range: Money
+    description: "Account balance prior to the transaction"
+  - name: hasBalanceAfter
+    range: Money
+    description: "Account balance after the transaction"
+relationships:
+  - name: postsToSaving
+    target: SavingAccount
+    cardinality: many-to-one
+    description: "A Transaction posts to a SavingAccount"
+  - name: postsToCurrent
+    target: CurrentAccount
+    cardinality: many-to-one
+    description: "A Transaction posts to a CurrentAccount"
+
+rules:
+  - name: nonZeroAmount
+    description: "Transaction amount must not be zero"
+    type: constraint
+    expression: "amount != 0"
+  - name: accountingIdentity
+    description: "The balance after equals the balance before plus the transaction amount"
+    type: derivation
+    expression: "balance_after = balance_before + amount"
+  - name: signByType
+    description: "Deposits must have positive amount; withdrawals must have negative amount"
+    type: constraint
+    expression: "transaction_type = 'deposit' implies amount > 0; transaction_type = 'withdrawal' implies amount < 0"
+  - name: postsToExactlyOne
+    description: "A Transaction must post to either a SavingAccount or a CurrentAccount, not both"
+    type: integrity
+    expression: "exactly_one(postsToSaving, postsToCurrent)"
+maps_to:
+  semantic_model: transaction
+  entity: transaction
+  dimensions: [transaction_type, status, transaction_date, currency]
+  measures: [amount, transaction_count, net_flow]

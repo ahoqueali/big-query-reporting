@@ -1,0 +1,45 @@
+table: current_account
+dataset: core
+project: your_gcp_project
+description: "One row per current (checking) account held by a customer"
+partition_by:
+  field: opened_date
+  type: DATE
+cluster_by: [customer_id, overdraft_limit]
+columns:
+  - name: current_account_id
+    type: STRING
+    mode: REQUIRED
+    description: "Primary key"
+  - name: customer_id
+    type: STRING
+    mode: REQUIRED
+    description: "Foreign key to customer.customer_id"
+  - name: balance
+    type: NUMERIC
+    mode: REQUIRED
+    description: "Current account balance"
+  - name: currency
+    type: STRING
+    mode: REQUIRED
+    description: "ISO 4217 currency code, e.g. USD"
+  - name: overdraft_limit
+    type: NUMERIC
+    mode: NULLABLE
+    description: "Maximum overdraft amount allowed"
+  - name: overdraft_interest_rate
+    type: NUMERIC
+    mode: NULLABLE
+    description: "Annual interest rate on overdrawn balances"
+  - name: has_debit_card
+    type: BOOL
+    mode: NULLABLE
+    description: "Whether a debit card is linked to this account"
+  - name: opened_date
+    type: DATE
+    mode: REQUIRED
+    description: "Date the account was opened"
+  - name: status
+    type: STRING
+    mode: NULLABLE
+    description: "e.g. active, closed, frozen"

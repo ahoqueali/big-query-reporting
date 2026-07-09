@@ -1,0 +1,44 @@
+entity: CurrentAccount
+description: "A transactional account used for everyday spending"
+properties:
+  - name: hasBalance
+    range: Money
+    description: "Current monetary balance of the current account"
+  - name: hasCurrency
+    range: Currency
+    description: "ISO 4217 currency the account is denominated in"
+  - name: hasOverdraftLimit
+    range: Money
+    description: "Maximum negative balance permitted on the account"
+  - name: hasOverdraftInterestRate
+    range: Rate
+    description: "Interest rate charged on overdrawn balances"
+  - name: hasDebitCard
+    range: Boolean
+    description: "Whether a debit card is linked to the account"
+  - name: hasStatus
+    range: AccountStatus
+    description: "Lifecycle state, e.g. active, closed, frozen"
+relationships:
+  - name: heldBy
+    target: Customer
+    cardinality: many-to-one
+    description: "A CurrentAccount is held by exactly one Customer"
+rules:
+  - name: overdraftBound
+    description: "Balance must not exceed overdraft limit in the negative direction"
+    type: constraint
+    expression: "balance >= -overdraft_limit"
+  - name: debitCardRequiresActive
+    description: "A CurrentAccount with a debit card must be active"
+    type: constraint
+    expression: "has_debit_card = true implies status = 'active'"
+  - name: overdraftRequiresInterestRate
+    description: "An overdraft limit must have a corresponding interest rate"
+    type: constraint
+    expression: "overdraft_limit is not null implies overdraft_interest_rate is not null"
+maps_to:
+  semantic_model: current_account
+  entity: current_account
+  dimensions: [has_debit_card, status, currency, opened_date]
+  measures: [balance, current_account_count, avg_current_balance]
